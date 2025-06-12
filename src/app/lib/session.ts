@@ -1,43 +1,35 @@
 import 'server-only';
-import { SignJWT, jwtVerify } from 'jose';
-import { cookies } from 'next/headers';
-//payload for defining the session
 
-const secretKey = process.env.SESSION_SECRET;
+import CryptoJS from 'crypto-js';
+import { cookies } from 'next/headers';
+
+const secretKey = process.env.SESSION_SECRET ?? "";
 const encondedKey = new TextEncoder().encode(secretKey);
 
-//TODO: make definition of session payload
-export async function encrypt({
-  userId,
-  expiresAt,
-}: {
-  userId: string;
-  expiresAt: Date;
-}) {
-  return new SignJWT({ userId, expiresAt })
-    .setProtectedHeader({ alg: 'HS256' })
-    .setIssuedAt()
-    .setExpirationTime('8h')
-    .sign(encondedKey);
-}
+const encrypt = (data: string | object): string => {
+  const stringData = typeof data === 'object' ? JSON.stringify(data) : data;
+  return CryptoJS.AES.encrypt(stringData, 'xD').toString();
+};
 
-export async function decrypt(session: string | undefined = '') {
+const decrypt = (encrypted: string): any => {
+  if (!encrypted) return null;
+
   try {
-    const { payload } = await jwtVerify(session, encondedKey, {
-      algorithms: ['HS256'],
-    });
-    return payload;
-  } catch {
-    console.log('Error decrypting session');
+    const bytes = CryptoJS.AES.decrypt(encrypted, 'xD');
+    const decrypted = bytes.toString(CryptoJS.enc.Utf8);
+    return JSON.parse(decrypted);
+  } catch (e) {
+    console.error('Decrypt failed:', e);
+    return null;
   }
-}
+};
 
-export async function createSession(userId: string) {
-  const expiresAt = new Date(Date.now() + 8 * 60 * 60 * 1000); // 8 hours
-  const session = await encrypt({ userId, expiresAt });
+export async function setSession(key: string, data: any) {
+  const expiresAt = new Date(Date.now() + 8 * 60 * 60 * 1000);
+  const session = encrypt(data);
   const cookieStore = await cookies();
 
-  cookieStore.set('session', session, {
+  cookieStore.set(key, session, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     expires: expiresAt,
@@ -46,7 +38,21 @@ export async function createSession(userId: string) {
   });
 }
 
-export async function deleteSession() {
+export async function getSession<T = any>(key: string) {
+  const cookieStore = await cookies();
+  const sessionCookie = cookieStore.get(key);
+  if (!sessionCookie) return null;
+  return decrypt(sessionCookie?.value) as T;
+}
+
+export async function deleteSession(key: string) {
   const cookieStore = await cookies();
   cookieStore.delete('session');
+}
+
+export async function deleteAll() {
+  const cookieStore = await cookies();
+  cookieStore.delete('permissions');
+  cookieStore.delete('session');
+  cookieStore.delete('accesses');
 }

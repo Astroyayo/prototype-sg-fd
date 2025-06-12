@@ -1,0 +1,1 @@
+export const apiEndPoint: string = process.env.NEXT_PUBLIC_API_ENDPOINT ?? 'http://kubipro.bodesa.mx/api/v1/';

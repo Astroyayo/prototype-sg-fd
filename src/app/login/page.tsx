@@ -1,5 +1,9 @@
 'use client';
 
+import InputText from '@/app/components/InputText';
+import InputPassword from '@/app/components/inputPassword';
+import Button from '@/app/components/button';
+import Icon from '@/app/components/icon';
 import { login } from '@/app/lib/auth';
 import { useActionState } from 'react';
 
@@ -14,36 +18,22 @@ export default function LoginPage() {
           <label className='block text-sm font-medium mb-1' htmlFor='username'>
             Username
           </label>
-          <input
-            type='text'
-            id='username'
-            name='username'
-            className='w-full px-3 py-2 border rounded focus:outline-none focus:ring'
-            required
-          />
+          <InputText id='username' name="username" start={
+            <Icon icon="person"></Icon>
+          }/>
         </div>
         <div className='mb-4'>
           <label className='block text-sm font-medium mb-1' htmlFor='password'>
             Password
           </label>
-          <input
-            type='password'
-            id='password'
-            name='password'
-            className='w-full px-3 py-2 border rounded focus:outline-none focus:ring'
-            required
-          />
+          <InputPassword id='password' name="password" start={
+            <Icon icon="password"></Icon>
+          }/>
         </div>
         {state && (
           <div className='text-red-500 text-sm mb-4'>{state.message}</div>
         )}
-        <button
-          type='submit'
-          disabled={pending}
-          className='w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition-colors'
-        >
-          Login
-        </button>
+        <Button buttonClass='w-full mt-6' text="Login" isLoading={pending}></Button>
       </form>
     </div>
   );

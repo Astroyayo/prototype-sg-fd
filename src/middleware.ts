@@ -1,6 +1,7 @@
+'server-only';
+
 import { NextRequest, NextResponse } from 'next/server';
-import { decrypt } from '@/app/lib/session';
-import { cookies } from 'next/headers';
+import { getSession } from '@/app/lib/session';
 
 const protectedRoutes = ['/'];
 const publicRoutes = ['/login'];
@@ -10,14 +11,13 @@ export default async function middleware(req: NextRequest) {
   const isProtectedRoute = protectedRoutes.includes(path);
   const isPublicRoute = publicRoutes.includes(path);
 
-  const cookie = (await cookies()).get('session')?.value;
-  const session = await decrypt(cookie);
+  const session = await getSession("session");
 
-  if (isProtectedRoute && !session?.userId) {
+  if (isProtectedRoute && !session) {
     return NextResponse.redirect(new URL('/login', req.nextUrl));
   }
 
-  if (isPublicRoute && session?.userId) {
+  if (isPublicRoute && session) {
     return NextResponse.redirect(new URL('/', req.nextUrl));
   }
 
