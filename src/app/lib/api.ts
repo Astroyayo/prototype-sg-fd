@@ -27,7 +27,7 @@ class ApiClass {
     });
   }
 
-  set Authorization(token: string) {
+  set Authorization(token: string | null) {
     this._axios.defaults.headers['Authorization'] = token;
   }
 

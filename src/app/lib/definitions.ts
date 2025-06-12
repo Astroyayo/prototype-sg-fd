@@ -8,6 +8,7 @@ export type FormState =
 
 export type AuthResponse = {
   authorization: string,
+  exp: number,
   caducidadPassword: string,
   fechaUltimoPassword: string,
   idPerfil: string,

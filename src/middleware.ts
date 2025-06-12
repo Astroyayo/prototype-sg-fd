@@ -11,7 +11,7 @@ export default async function middleware(req: NextRequest) {
   const isProtectedRoute = protectedRoutes.includes(path);
   const isPublicRoute = publicRoutes.includes(path);
 
-  const session = await getSession("session");
+  const session = await getSession("CO_AUTH");
 
   if (isProtectedRoute && !session) {
     return NextResponse.redirect(new URL('/login', req.nextUrl));

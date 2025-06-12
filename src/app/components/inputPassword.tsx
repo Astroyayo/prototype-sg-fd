@@ -21,6 +21,7 @@ const InputPassword: React.FC<Props> = ({ value, onChange, start, end, ...rest }
         type="password"
         className="flex-1 border-none outline-none px-1"
         value={value}
+        onChange={onChange}
         {...rest}
       />
 

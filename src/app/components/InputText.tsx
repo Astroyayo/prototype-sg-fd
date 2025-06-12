@@ -21,6 +21,7 @@ const InputText: React.FC<Props> = ({ value, onChange, start, end, ...rest }) =>
         type="text"
         className="flex-1 border-none outline-none px-1"
         value={value}
+        onChange={onChange}
         {...rest}
       />
 
